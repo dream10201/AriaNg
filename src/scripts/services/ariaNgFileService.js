@@ -108,48 +108,37 @@
                                         thisOptions.errorCallback('The selected file type is invalid!');
                                     }
                                 }
+                                continue;
                             }
-                        }
+                            reader = new FileReader();
+                            reader.onload = function () {
+                                var temp={
+                                    fileName: fileName
+                                };
 
-                        var reader = new FileReader();
-
-                        reader.onload = function () {
-                            var result = {
-                                fileName: fileName
+                                switch (thisOptions.fileType) {
+                                    case 'text':
+                                        temp.content = this.result;
+                                        break;
+                                    case 'binary':
+                                    default:
+                                        temp.base64Content = this.result.replace(/.*?base64,/, '');
+                                        break;
+                                }
+                                result.push(temp);
                             };
 
-                            switch (thisOptions.fileType) {
-                                case 'text':
-                                    result.content = this.result;
-                                    break;
-                                case 'binary':
-                                default:
-                                    result.base64Content = this.result.replace(/.*?base64,/, '');
-                                    break;
-                            }
-
-                            if (thisOptions.successCallback) {
-                                if (thisOptions.scope) {
-                                    thisOptions.scope.$apply(function () {
-                                        thisOptions.successCallback(result);
-                                    });
-                                } else {
-                                    thisOptions.successCallback(result);
-                                }
-                            }
-                        };
-
-                        reader.onerror = function () {
-                            if (thisOptions.errorCallback) {
-                                if (thisOptions.scope) {
-                                    thisOptions.scope.$apply(function () {
+                            reader.onerror = function () {
+                                if (thisOptions.errorCallback) {
+                                    if (thisOptions.scope) {
+                                        thisOptions.scope.$apply(function () {
+                                            thisOptions.errorCallback('Failed to load file!');
+                                        });
+                                    } else {
                                         thisOptions.errorCallback('Failed to load file!');
-                                    });
-                                } else {
-                                    thisOptions.errorCallback('Failed to load file!');
+                                    }
                                 }
-                            }
-                        };
+                            };
 
                             switch (thisOptions.fileType) {
                                 case 'text':
