@@ -1,7 +1,7 @@
 <div class="row" data-option-key="{{option.key}}">
     <div class="setting-key setting-key-without-desc col-sm-4">
         <span ng-bind="option.nameKey | translate"></span>
-        <em ng-bind="'(' + option.key + ')'"></em>
+        <em class="select-text" ng-bind="'(' + option.key + ')'"></em>
         <i class="icon-primary fa fa-question-circle" ng-if="(option.descriptionKey | translate) !== ''"
            data-toggle="popover" data-trigger="hover" data-placement="auto top" data-container="body" data-content="{{option.descriptionKey | translate}}"></i>
         <span class="description" ng-if="option.showCount && option.split && optionValue"

@@ -76,15 +76,16 @@
 
         var downloadByTorrent = function (pauseOnAdded, responseCallback) {
             var options = angular.copy($scope.context.options);
+            for(var i=0;i<$scope.context.uploadFile.length;i++){
+                var task = {
+                    content: $scope.context.uploadFile[i].base64Content,
+                    options: options
+                };
 
-            var task = {
-                content: $scope.context.uploadFile.base64Content,
-                options: options
-            };
-
-            saveDownloadPath(task.options);
-
-            return aria2TaskService.newTorrentTask(task, pauseOnAdded, responseCallback);
+                saveDownloadPath(task.options);
+                aria2TaskService.newTorrentTask(task, pauseOnAdded, responseCallback);
+            }
+            return "";
         };
 
         var downloadByMetalink = function (pauseOnAdded, responseCallback) {
@@ -209,7 +210,11 @@
         };
 
         $scope.startDownload = function (pauseOnAdded) {
+            // timeout
+            $rootScope.loadPromise=$timeout(function () {}, 1000*60);
             var responseCallback = function (response) {
+                // clear loading
+                $rootScope.loadPromise=null;
                 if (!response.hasSuccess && !response.success) {
                     return;
                 }

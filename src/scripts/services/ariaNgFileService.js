@@ -71,7 +71,7 @@
                 }, options);
 
                 if (!element || !element.change) {
-                    element = angular.element('<input type="file" style="display: none"/>');
+                    element = angular.element('<input type="file" multiple="multiple" style="display: none"/>');
                 }
 
                 element.data('options', options);
@@ -90,71 +90,74 @@
 
                         var thisOptions = element.data('options');
                         var allowedExtensions = getAllowedExtensions(thisOptions.fileFilter);
-                        var file = this.files[0];
-                        var fileName = file.name;
+                        var reader;
+                        var result = [];
+                        var file;
+                        var fileName
+                        for (var i = 0; i < this.files.length; i++) {
+                            file = this.files[i];
+                            fileName = file.name;
 
-                        if (!checkFileExtension(fileName, allowedExtensions)) {
-                            if (thisOptions.errorCallback) {
-                                if (thisOptions.scope) {
-                                    thisOptions.scope.$apply(function () {
+                            if (!checkFileExtension(fileName, allowedExtensions)) {
+                                if (thisOptions.errorCallback) {
+                                    if (thisOptions.scope) {
+                                        thisOptions.scope.$apply(function () {
+                                            thisOptions.errorCallback('The selected file type is invalid!');
+                                        });
+                                    } else {
                                         thisOptions.errorCallback('The selected file type is invalid!');
-                                    });
-                                } else {
-                                    thisOptions.errorCallback('The selected file type is invalid!');
+                                    }
                                 }
+                                continue;
                             }
+                            reader = new FileReader();
+                            reader.onload = function () {
+                                var temp={
+                                    fileName: fileName
+                                };
 
-                            return;
-                        }
+                                switch (thisOptions.fileType) {
+                                    case 'text':
+                                        temp.content = this.result;
+                                        break;
+                                    case 'binary':
+                                    default:
+                                        temp.base64Content = this.result.replace(/.*?base64,/, '');
+                                        break;
+                                }
+                                result.push(temp);
+                            };
 
-                        var reader = new FileReader();
-
-                        reader.onload = function () {
-                            var result = {
-                                fileName: fileName
+                            reader.onerror = function () {
+                                if (thisOptions.errorCallback) {
+                                    if (thisOptions.scope) {
+                                        thisOptions.scope.$apply(function () {
+                                            thisOptions.errorCallback('Failed to load file!');
+                                        });
+                                    } else {
+                                        thisOptions.errorCallback('Failed to load file!');
+                                    }
+                                }
                             };
 
                             switch (thisOptions.fileType) {
                                 case 'text':
-                                    result.content = this.result;
+                                    reader.readAsText(file);
                                     break;
                                 case 'binary':
                                 default:
-                                    result.base64Content = this.result.replace(/.*?base64,/, '');
+                                    reader.readAsDataURL(file);
                                     break;
                             }
-
-                            if (thisOptions.successCallback) {
-                                if (thisOptions.scope) {
-                                    thisOptions.scope.$apply(function () {
-                                        thisOptions.successCallback(result);
-                                    });
-                                } else {
+                        }
+                        if (thisOptions.successCallback) {
+                            if (thisOptions.scope) {
+                                thisOptions.scope.$apply(function () {
                                     thisOptions.successCallback(result);
-                                }
+                                });
+                            } else {
+                                thisOptions.successCallback(result);
                             }
-                        };
-
-                        reader.onerror = function () {
-                            if (thisOptions.errorCallback) {
-                                if (thisOptions.scope) {
-                                    thisOptions.scope.$apply(function () {
-                                        thisOptions.errorCallback('Failed to load file!');
-                                    });
-                                } else {
-                                    thisOptions.errorCallback('Failed to load file!');
-                                }
-                            }
-                        };
-
-                        switch (thisOptions.fileType) {
-                            case 'text':
-                                reader.readAsText(file);
-                                break;
-                            case 'binary':
-                            default:
-                                reader.readAsDataURL(file);
-                                break;
                         }
                     }).attr('data-ariang-file-initialized', 'true');
                 }
@@ -173,7 +176,7 @@
                     autoRevoke: false
                 }, options);
 
-                var blob = new Blob([content], { type: options.contentType });
+                var blob = new Blob([content], {type: options.contentType});
                 var objectUrl = URL.createObjectURL(blob);
 
                 if (!element) {
