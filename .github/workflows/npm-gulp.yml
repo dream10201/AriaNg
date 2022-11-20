@@ -2,9 +2,7 @@ name: NodeJS with Gulp
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches: [ "new" ]
 
 jobs:
   build:
@@ -16,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        ref: new
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
