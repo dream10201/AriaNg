@@ -4,11 +4,6 @@
     angular.module('ariaNg').controller('MainController', ['$rootScope', '$scope', '$route', '$window', '$location', '$document', '$interval', 'clipboard', 'aria2RpcErrors', 'ariaNgCommonService', 'ariaNgVersionService', 'ariaNgNotificationService', 'ariaNgSettingService', 'ariaNgMonitorService', 'ariaNgTitleService', 'aria2TaskService', 'aria2SettingService', function ($rootScope, $scope, $route, $window, $location, $document, $interval, clipboard, aria2RpcErrors, ariaNgCommonService, ariaNgVersionService, ariaNgNotificationService, ariaNgSettingService, ariaNgMonitorService, ariaNgTitleService, aria2TaskService, aria2SettingService) {
         var pageTitleRefreshPromise = null;
         var globalStatRefreshPromise = null;
-        document.onkeydown=function (event){
-            if(event.key==="a" && (event.ctrlKey || event.metaKey) ){
-                $scope.selectAllTasks();
-            }
-        };
         var refreshPageTitle = function () {
             var title = ariaNgTitleService.getFinalTitleByGlobalStat({
                 globalStat: $scope.globalStat,
